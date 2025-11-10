@@ -20,7 +20,14 @@ final class MercAIViewModel: ObservableObject {
         self.fallbackService = RuleBasedAIService()
         
         if messages.isEmpty {
-            messages.append(AIMessage(role: .assistant, text: "Hola, soy Cora 🤖. Pregúntame por productos, ofertas o crea tu lista."))
+            let dayOfWeek = getDayOfWeek()
+            let currentBasket = fetchCurrentBasket()
+            
+            if currentBasket.isEmpty {
+                messages.append(AIMessage(role: .assistant, text: "¡Hola! Soy CORA, tu asistente de compra predictiva 😊\n\nVoy a ayudarte sugiriéndote productos basándome en:\n✓ Tu histórico de compras\n✓ El día de hoy (\(dayOfWeek))\n✓ Lo que llevas en el carrito\n\nEmpecemos..."))
+            } else {
+                messages.append(AIMessage(role: .assistant, text: "¡Hola! Soy CORA 😊\n\nVeo que ya tienes \(currentBasket.count) producto(s) en tu carrito. Estoy aquí para ayudarte a completar tu compra con sugerencias inteligentes basadas en tus hábitos y el día de hoy (\(dayOfWeek))."))
+            }
         }
     }
 
@@ -37,7 +44,18 @@ final class MercAIViewModel: ObservableObject {
         do {
             // Intentar usar ChatGPT
             let products = fetchAllProducts()
-            let replyText = try await chatGPTService.sendMessage(userMessage.text, conversationHistory: messages, products: products)
+            let currentBasket = fetchCurrentBasket()
+            let dayOfWeek = getDayOfWeek()
+            let purchaseHistory = fetchPurchaseHistory()
+            
+            let replyText = try await chatGPTService.sendMessage(
+                userMessage.text,
+                conversationHistory: messages,
+                products: products,
+                currentBasket: currentBasket,
+                dayOfWeek: dayOfWeek,
+                purchaseHistory: purchaseHistory
+            )
             
             let reply = AIMessage(role: .assistant, text: replyText)
             messages.append(reply)
@@ -103,6 +121,33 @@ final class MercAIViewModel: ObservableObject {
         } catch {
             return []
         }
+    }
+    
+    private func fetchCurrentBasket() -> [Product] {
+        do {
+            let descriptor = FetchDescriptor<Basket>()
+            if let basket = try modelContext.fetch(descriptor).first {
+                return basket.products
+            }
+            return []
+        } catch {
+            return []
+        }
+    }
+    
+    private func getDayOfWeek() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "es_ES")
+        formatter.dateFormat = "EEEE"
+        let dayName = formatter.string(from: Date())
+        return dayName.capitalized
+    }
+    
+    private func fetchPurchaseHistory() -> [String] {
+        // Por ahora retornamos un array vacío
+        // En el futuro, esto podría leer de un modelo de historial de compras
+        // Por ejemplo: PurchaseRecord o similar
+        return []
     }
 }
 
