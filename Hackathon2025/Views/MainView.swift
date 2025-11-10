@@ -4,20 +4,11 @@ struct MainView: View {
     var body: some View {
         TabView {
             MercAI()
-                .tabItem {
-                    Label("MercAI", systemImage: "calendar")
-                }
-            SmartPath()
-                .tabItem {
-                    Label("SmartPath", systemImage: "books.vertical")
-                }
-        }
-    }
-}
+                .tabItem { Label("MercAI", systemImage: "calendar") }
 
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
+            SmartPath()
+                .tabItem { Label("SmartPath", systemImage: "books.vertical") }
+        }
     }
 }
 
