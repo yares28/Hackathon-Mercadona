@@ -4,10 +4,10 @@ import SwiftData
 @Model
 final class Basket: Identifiable {
     var id: UUID
-    var products: [Product]
+    var entries: [CartEntry]
 
-    init(id: UUID = UUID(), products: [Product] = []) {
+    init(id: UUID = UUID(), entries: [CartEntry] = []) {
         self.id = id
-        self.products = products
+        self.entries = entries
     }
 }
