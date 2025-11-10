@@ -1,12 +1,18 @@
 import SwiftUI
+import SwiftData
+import Combine
 
 struct SmartPath: View {
+    @Environment(\.modelContext) private var modelContext
+    @StateObject private var holder = ViewModelHolder()
+    
     private let map = DemoStoreMap.make()
     private let basket = DemoBasket.make()
 
     @State private var route: [CGPoint] = []
     @State private var visitOrder: [UUID: Int] = [:]
     @State private var showRoute = false
+    @State private var showCart = false
 
     init() {
         let products = [
@@ -56,13 +62,94 @@ struct SmartPath: View {
                                 .imageScale(.large)
                         }
 
-                        Button(action: {}) {
-                            Image(systemName: "cart").imageScale(.large)
+                        Button(action: {
+                            showCart = true
+                        }) {
+                            // Mostrar estado del carrito
+                            let _ = viewModel.cartUpdateTrigger
+                            
+                            if viewModel.cartCount > 0 {
+                                // Estilo destacado cuando hay items
+                                HStack(spacing: 8) {
+                                    Image(systemName: "cart.fill")
+                                        .font(.system(size: 16, weight: .semibold))
+                                    
+                                    // Círculo marrón con el número
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.brown)
+                                            .frame(width: 24, height: 24)
+                                        Text("\(viewModel.cartCount)")
+                                            .font(.system(size: 12, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .monospacedDigit()
+                                    }
+                                    
+                                    Text(formatPrice(viewModel.getTotalPrice()))
+                                        .font(.system(size: 14, weight: .bold))
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.orange)
+                                )
+                            } else {
+                                // Estilo simple cuando está vacío
+                                HStack(spacing: 6) {
+                                    Image(systemName: "cart")
+                                    Text("0")
+                                        .font(.subheadline).monospacedDigit()
+                                }
+                                .foregroundColor(.primary)
+                            }
                         }
+                        .accessibilityLabel("Artículos en carrito: \(viewModel.cartCount)")
                     }
                 }
             }
-        }}
+            .sheet(isPresented: $showCart) {
+                CartView(viewModel: viewModel)
+            }
+            .onAppear {
+                if holder.viewModel == nil {
+                    holder.viewModel = ProductsViewModel(modelContext: modelContext)
+                    holder.observeViewModel()
+                }
+                holder.viewModel?.refresh()
+                holder.viewModel?.updateCartCount()
+            }
+        }
+    
+    private var viewModel: ProductsViewModel {
+        if let vm = holder.viewModel { return vm }
+        let vm = ProductsViewModel(modelContext: modelContext)
+        holder.viewModel = vm
+        holder.observeViewModel()
+        return vm
+    }
+    
+    private func formatPrice(_ cents: Int) -> String {
+        let euros = Double(cents) / 100.0
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "es_ES")
+        formatter.numberStyle = .currency
+        return formatter.string(from: NSNumber(value: euros)) ?? "€\(euros)"
+    }}
+
+// MARK: - ViewModelHolder
+private final class ViewModelHolder: ObservableObject {
+    @Published var viewModel: ProductsViewModel?
+    private var cancellable: AnyCancellable?
+    
+    func observeViewModel() {
+        guard let vm = viewModel else { return }
+        cancellable = vm.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
+    }
+}
 
 // MARK: - Ruta por pasillos + orden de visita
 private extension SmartPath {

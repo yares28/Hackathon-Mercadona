@@ -105,6 +105,7 @@ struct ProductsCatalogView: View {
 			}
 			holder.viewModel?.refresh()
 			holder.viewModel?.updateCartCount()
+			holder.viewModel?.createSampleOrders()
 		}
 	}
 
@@ -393,15 +394,9 @@ private struct ProductTile: View {
 		VStack(alignment: .leading, spacing: 0) {
 			// Imagen del producto con favorito
 			ZStack(alignment: .topTrailing) {
-				// Fondo de la imagen
+				// Fondo blanco de la imagen
 				RoundedRectangle(cornerRadius: 16)
-					.fill(
-						LinearGradient(
-							colors: [Color(uiColor: .systemBackground), Color(uiColor: .secondarySystemBackground)],
-							startPoint: .topLeading,
-							endPoint: .bottomTrailing
-						)
-					)
+					.fill(Color.white)
 					.frame(height: 140)
 				
 				// Imagen del producto o icono de placeholder
@@ -446,6 +441,10 @@ private struct ProductTile: View {
 				}
 				.padding(8)
 			}
+			
+			// Separador visual
+			Divider()
+				.padding(.horizontal, 8)
 			
 			// Información del producto
 			VStack(alignment: .leading, spacing: 6) {

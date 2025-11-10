@@ -4,6 +4,8 @@ import SwiftData
 struct CartView: View {
 	@Environment(\.dismiss) private var dismiss
 	@ObservedObject var viewModel: ProductsViewModel
+	@State private var showOrderHistory = false
+	@State private var showPaymentConfirmation = false
 	
 	var body: some View {
 		NavigationStack {
@@ -17,6 +19,17 @@ struct CartView: View {
 			.navigationTitle("Mi Carrito")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
+				ToolbarItem(placement: .navigationBarLeading) {
+					Button(action: {
+						showOrderHistory = true
+					}) {
+						Image(systemName: "clock.arrow.circlepath")
+							.font(.system(size: 18, weight: .semibold))
+							.foregroundColor(.orange)
+					}
+					.accessibilityLabel("Ver historial de pedidos")
+				}
+				
 				ToolbarItem(placement: .navigationBarTrailing) {
 					Button("Cerrar") {
 						dismiss()
@@ -24,6 +37,16 @@ struct CartView: View {
 					.foregroundColor(.orange)
 				}
 			}
+		}
+		.sheet(isPresented: $showOrderHistory) {
+			OrderHistoryView(viewModel: viewModel)
+		}
+		.alert("¡Pago completado!", isPresented: $showPaymentConfirmation) {
+			Button("Aceptar", role: .cancel) {
+				dismiss()
+			}
+		} message: {
+			Text("Tu pedido ha sido procesado exitosamente")
 		}
 	}
 	
@@ -75,7 +98,8 @@ struct CartView: View {
 				.padding(.horizontal, 16)
 				
 				Button(action: {
-					// Acción de pagar
+					viewModel.completePayment()
+					showPaymentConfirmation = true
 				}) {
 					HStack {
 						Spacer()
@@ -120,13 +144,7 @@ struct CartItemRow: View {
 			// Imagen del producto
 			ZStack {
 				RoundedRectangle(cornerRadius: 12)
-					.fill(
-						LinearGradient(
-							colors: [Color(uiColor: .systemBackground), Color(uiColor: .secondarySystemBackground)],
-							startPoint: .topLeading,
-							endPoint: .bottomTrailing
-						)
-					)
+					.fill(Color.white)
 				Group {
 					if let uiImage = UIImage(named: item.product.imageName), uiImage.size.width > 1 {
 						Image(uiImage: uiImage)

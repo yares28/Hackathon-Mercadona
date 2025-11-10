@@ -74,13 +74,7 @@ struct ProductDetailView: View {
 	private var productImageSection: some View {
 		ZStack {
 			RoundedRectangle(cornerRadius: 20)
-				.fill(
-					LinearGradient(
-						colors: [Color(uiColor: .systemBackground), Color(uiColor: .secondarySystemBackground)],
-						startPoint: .topLeading,
-						endPoint: .bottomTrailing
-					)
-				)
+				.fill(Color.white)
 				.frame(height: 280)
 			
 			Group {
@@ -99,6 +93,7 @@ struct ProductDetailView: View {
 		}
 		.padding(.horizontal, 16)
 		.padding(.top, 16)
+		.shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
 	}
 	
 	private var productInfoSection: some View {
