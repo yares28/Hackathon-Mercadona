@@ -7,5 +7,6 @@ struct Hackathon2025App: App {
             WindowGroup {
                 MainView()
             }
+            .modelContainer(for: [Product.self, Basket.self])
         }
 }
