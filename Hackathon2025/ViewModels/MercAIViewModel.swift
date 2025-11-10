@@ -126,10 +126,25 @@ final class MercAIViewModel: ObservableObject {
     private func fetchCurrentBasket() -> [Product] {
         do {
             let descriptor = FetchDescriptor<Basket>()
-            if let basket = try modelContext.fetch(descriptor).first {
-                return basket.products
+            guard let basket = try modelContext.fetch(descriptor).first else {
+                return []
             }
-            return []
+            
+            // Obtener todos los productos para buscar por ID
+            let allProducts = fetchAllProducts()
+            var basketProducts: [Product] = []
+            
+            // Para cada entry en el carrito, buscar el producto correspondiente
+            for entry in basket.entries {
+                if let product = allProducts.first(where: { $0.id == entry.productId }) {
+                    // Añadir el producto tantas veces como la cantidad
+                    for _ in 0..<entry.quantity {
+                        basketProducts.append(product)
+                    }
+                }
+            }
+            
+            return basketProducts
         } catch {
             return []
         }

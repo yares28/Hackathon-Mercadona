@@ -9,7 +9,14 @@ struct SmartPath: View {
     @State private var showRoute = false
 
     init() {
-        DemoDistributor.distribute(basket: basket, on: map)
+        let products = [
+            Product(name: "Leche entera 1L", price: 1.19, imageName: "photo"),
+            Product(name: "Pan barra", price: 0.75, imageName: "photo"),
+            Product(name: "Huevos M (12u)", price: 2.10, imageName: "photo"),
+            Product(name: "Aceite de oliva 1L", price: 7.49, imageName: "photo"),
+            Product(name: "Pasta espagueti 500g", price: 0.99, imageName: "photo")
+        ]
+        DemoDistributor.distribute(basket: basket, on: map, allProducts: products)
     }
 
     var body: some View {
@@ -60,9 +67,14 @@ struct SmartPath: View {
 // MARK: - Ruta por pasillos + orden de visita
 private extension SmartPath {
     func shelvesWithBasketProducts() -> [Shelf] {
-        let wanted = Set(basket.products.map(\.id))
+        // Convertir entries del basket a productos
+        var basketProductIds: Set<UUID> = []
+        for entry in basket.entries {
+            basketProductIds.insert(entry.productId)
+        }
+        
         return map.shelves.filter { shelf in
-            shelf.products.contains { wanted.contains($0.id) }
+            shelf.products.contains { basketProductIds.contains($0.id) }
         }
     }
 

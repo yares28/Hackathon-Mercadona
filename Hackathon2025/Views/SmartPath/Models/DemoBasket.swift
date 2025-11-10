@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 enum DemoBasket {
     static func make() -> Basket {
@@ -8,6 +9,9 @@ enum DemoBasket {
         let aceite = Product(name: "Aceite de oliva 1L",      price: 7.49, imageName: "photo")
         let pasta  = Product(name: "Pasta espagueti 500g",    price: 0.99, imageName: "photo")
 
-        return Basket(products: [leche, pan, huevos, aceite, pasta])
+        let products = [leche, pan, huevos, aceite, pasta]
+        let entries = products.map { CartEntry(productId: $0.id, quantity: 1) }
+        
+        return Basket(entries: entries)
     }
 }
