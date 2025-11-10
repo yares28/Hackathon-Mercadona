@@ -226,6 +226,15 @@ final class MercAIViewModel: ObservableObject {
         }
     }
     
+    func addConfirmationMessage(for product: Product, quantity: Int = 1) {
+        // Solo añadir el mensaje de confirmación sin modificar el carrito
+        if quantity > 1 {
+            messages.append(AIMessage(role: .assistant, text: "✅ \(quantity) x \(product.name) añadido(s) al carrito"))
+        } else {
+            messages.append(AIMessage(role: .assistant, text: "✅ \(product.name) añadido al carrito"))
+        }
+    }
+    
     private func extractProductsWithQuantities(from text: String, products: [Product]) -> [(Product, Int)] {
         let lowerText = text.lowercased()
         var results: [(Product, Int)] = []
