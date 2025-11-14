@@ -7,11 +7,11 @@ App para iPhone hecha durante el Hackathon de la UPV con Mercadona. Básicamente
 ### Catálogo de Productos
 Puedes ver todos los productos de Mercadona, buscar lo que necesites, guardar tus favoritos y añadirlos al carrito. También puedes ver tu historial de pedidos anteriores.
 
-![alt text](/img/catalogo1)
-![alt text](/img/catalogo2)
-![alt text](/img/catalogo3)
-![alt text](/img/catalogo4)
-![alt text](/img/catalogo5)
+![Alt text](relative%20path/to/img.jpg?raw=true "catalogo1")
+![Alt text](relative%20path/to/img.jpg?raw=true "catalogo2")
+![Alt text](relative%20path/to/img.jpg?raw=true "catalogo3")
+![Alt text](relative%20path/to/img.jpg?raw=true "catalogo4")
+![Alt text](relative%20path/to/img.jpg?raw=true "catalogo5")
 
 ### Cora - Tu asistente personal
 Es como hablar por chat con alguien que te ayuda a hacer la compra. Le puedes preguntar cosas tipo "¿qué necesito para hacer una tortilla?" o "recomiéndame algo para cenar" y te ayuda a encontrar productos.
